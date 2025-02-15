@@ -1,37 +1,29 @@
-.container {
-  max-width: 1310px;
-  margin: 0 auto;
-  padding: 15px;
+.listHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
 
-  width: 100%;
+  h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
 
-  .listHeader {
+  button {
+    cursor: pointer;
+    padding: 12px 16px;
+    background: #0099f7;
+    color: white;
+    border: none;
+    border-radius: 6px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 25px;
+    font-size: 16px;
+    transition: background 0.3s ease;
 
-    h1 {
-      font-size: 24px;
-      font-weight: bold;
-      color: #333;
-    }
-
-    button {
-      cursor: pointer;
-      padding: 12px 16px;
-      background: #0099f7;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      font-size: 16px;
-      transition: background 0.3s ease;
-
-      &:hover {
-        background: darken(#0099f7, 10%);
-      }
+    &:hover {
+      background: darken(#0099f7, 10%);
     }
   }
 }

@@ -1,5 +1,8 @@
-.itemPage {
-  padding: 20px;
+.item {
+  min-height: 700px;
+
+  display: flex;
+  align-items: center;
 }
 
 .container {

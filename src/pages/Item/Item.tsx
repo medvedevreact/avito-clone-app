@@ -7,6 +7,7 @@ import axios from "axios";
 import { listingSchema } from "../../components/ListingForm/ListingFormShema";
 import { trimObjectValues } from "../../lib/utils";
 import { z } from "zod";
+import { Container } from "../../components/Container/Container";
 
 const defaultFormState = {
   Недвижимость: {
@@ -102,7 +103,7 @@ export const Item = () => {
   if (!item) return <div>Объявление не найдено.</div>;
 
   return (
-    <div className={styles.container}>
+    <Container>
       <div className={styles.item}>
         <div className={styles.imageContainer}>
           <img
@@ -159,6 +160,6 @@ export const Item = () => {
         onSave={handleSave}
         errors={errors}
       />
-    </div>
+    </Container>
   );
 };

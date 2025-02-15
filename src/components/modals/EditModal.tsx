@@ -47,9 +47,7 @@ export const EditModal = ({
         <div>
           {commonFields.map((field) => (
             <div key={field.name} className={styles.formField}>
-              <label>
-                <b>{field.label}:</b>
-              </label>
+              <label>{field.label}:</label>
               <input
                 type={field.type}
                 value={
@@ -68,9 +66,7 @@ export const EditModal = ({
           {formData.type &&
             typeFields[formData.type]?.map((field) => (
               <div key={field.name} className={styles.formField}>
-                <label>
-                  <b>{field.label}:</b>
-                </label>
+                <label>{field.label}:</label>
                 <input
                   type={field.type}
                   value={
