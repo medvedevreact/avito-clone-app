@@ -1,5 +1,9 @@
 # React + TypeScript + Vite
 
+## Видео-обзор
+
+[Смотреть видео](https://drive.google.com/file/d/15_OzEZJpEljkMJp39AXEyFj5tcX37DSZ/view?usp=sharing)
+
 Этот проект использует Vite для быстрого запуска и разработки React-приложений с TypeScript.
 
 ## Установка и запуск
