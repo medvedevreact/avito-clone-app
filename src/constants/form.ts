@@ -31,3 +31,35 @@ export const commonFields = [
 ];
 
 export const stepTitles = ["Выбор категории", "Заполнение информации"];
+
+export const emptyItemState = {
+  Недвижимость: {
+    type: "Недвижимость",
+    name: "",
+    description: "",
+    location: "",
+    propertyType: "",
+    area: "",
+    rooms: "",
+    price: "",
+  },
+  Авто: {
+    type: "Авто",
+    name: "",
+    description: "",
+    location: "",
+    brand: "",
+    model: "",
+    year: "",
+    mileage: "",
+  },
+  Услуги: {
+    type: "Услуги",
+    name: "",
+    description: "",
+    location: "",
+    serviceType: "",
+    experience: "",
+    cost: "",
+  },
+};

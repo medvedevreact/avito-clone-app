@@ -1,8 +1,7 @@
-import React from "react";
 import { FaVk, FaOdnoklassniki, FaYoutube } from "react-icons/fa";
 import styles from "./Footer.module.scss";
 
-export const Footer: React.FC = () => {
+export const Footer = () => {
   return (
     <footer className={styles.footer}>
       <p className={styles.description}>
@@ -16,7 +15,7 @@ export const Footer: React.FC = () => {
           rel="noopener noreferrer"
           className={styles.socialLink}
         >
-          <FaVk className={styles.icon} />
+          <FaVk className={styles.icon} data-testid="icon-vk" />
         </a>
         <a
           href="https://ok.ru"
@@ -24,7 +23,7 @@ export const Footer: React.FC = () => {
           rel="noopener noreferrer"
           className={styles.socialLink}
         >
-          <FaOdnoklassniki className={styles.icon} />
+          <FaOdnoklassniki className={styles.icon} data-testid="icon-ok" />
         </a>
         <a
           href="https://youtube.com"
@@ -32,7 +31,7 @@ export const Footer: React.FC = () => {
           rel="noopener noreferrer"
           className={styles.socialLink}
         >
-          <FaYoutube className={styles.icon} />
+          <FaYoutube className={styles.icon} data-testid="icon-youtube" />
         </a>
       </div>
     </footer>

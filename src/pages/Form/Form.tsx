@@ -1,6 +1,5 @@
-import React from "react";
-import styles from "./Form.module.scss";
 import { ListingForm } from "../../components/ListingForm/ListingForm";
+import styles from "./Form.module.scss";
 
 export const Form = () => {
   return (

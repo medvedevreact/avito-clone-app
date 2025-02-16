@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import Logo from "/img/AvitoCloneLogo.png";
-import styles from "./Header.module.scss";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Logo from "../../img/AvitoCloneLogo.png";
+import styles from "./Header.module.scss";
 
 export const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);

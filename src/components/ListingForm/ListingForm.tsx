@@ -1,69 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent } from "react";
 import Stepper from "react-stepper-horizontal";
 import { z } from "zod";
+import toast from "react-hot-toast";
+import { emptyItemState, stepTitles, types } from "../../constants/form";
+import { useNavigate } from "react-router-dom";
+import { listingSchema } from "./ListingFormShema";
+import { trimObjectValues } from "../../lib/utils";
+import { useAppDispatch } from "../../store";
+import { addItem } from "../../store/itemsSlice";
+import { ListForm } from "../ListForm/ListForm";
+import { Item } from "../../types/listings";
 
 import styles from "./ListingForm.module.scss";
 
-import {
-  commonFields,
-  stepTitles,
-  typeFields,
-  types,
-} from "../../constants/form";
-import { useAppDispatch } from "../../store";
-import { addItem } from "../../store/itemsSlice";
-import { useNavigate } from "react-router-dom";
-import { ListingFormData, listingSchema } from "./ListingFormShema";
-import { trimObjectValues } from "../../lib/utils";
-
-const defaultFormState = {
-  Недвижимость: {
-    type: "Недвижимость",
-    name: "",
-    description: "",
-    location: "",
-    propertyType: "",
-    area: 0,
-    rooms: 0,
-    price: 0,
-  },
-  Авто: {
-    type: "Авто",
-    name: "",
-    description: "",
-    location: "",
-    brand: "",
-    model: "",
-    year: 0,
-    mileage: -1,
-  },
-  Услуги: {
-    type: "Услуги",
-    name: "",
-    description: "",
-    location: "",
-    serviceType: "",
-    experience: -1,
-    cost: 0,
-  },
-};
-
-export const ListingForm = () => {
-  const [step, setStep] = useState(0);
-  const [formData, setFormData] = useState({});
-  const [errors, setErrors] = useState<Partial<ListingFormData>>({});
+export const ListingForm: React.FC = () => {
+  const [step, setStep] = useState<number>(0);
+  const [formData, setFormData] = useState<Partial<Item>>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const handleTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTypeChange = (event: ChangeEvent<HTMLInputElement>) => {
     const type = event.target.value;
-    setFormData(defaultFormState[type]);
+    // @ts-ignore
+    setFormData(emptyItemState[type] || {});
   };
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-
-    const isNumericField = [
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const numberFields = [
       "area",
       "rooms",
       "price",
@@ -71,26 +36,31 @@ export const ListingForm = () => {
       "mileage",
       "experience",
       "cost",
-    ].includes(name);
+    ];
 
-    const parsedValue = isNumericField
-      ? value === ""
-        ? -1
+    const newValue = numberFields.includes(name)
+      ? value.trim() === ""
+        ? value
+        : isNaN(Number(value))
+        ? value
         : Number(value)
       : value;
-
     setFormData((prevData) => ({
-      ...prevData,
-      [name]: parsedValue,
+      ...prevData!,
+      [name]: newValue,
     }));
   };
 
   const nextStep = () => {
-    setStep((prev) => prev + 1);
+    if (formData.type) {
+      setStep(1);
+    } else {
+      toast.error("Выберите тип объявления.");
+    }
   };
 
   const prevStep = () => {
-    setStep((prev) => Math.max(0, prev - 1));
+    setStep(0);
     setErrors({});
   };
 
@@ -98,15 +68,19 @@ export const ListingForm = () => {
     try {
       const trimmedFormData = trimObjectValues(formData);
       const validatedForm = listingSchema.parse(trimmedFormData);
+
       dispatch(addItem(validatedForm));
       setErrors({});
       navigate("/list");
     } catch (err) {
       if (err instanceof z.ZodError) {
-        const newErrors = err.errors.reduce((acc, error) => {
-          acc[error.path[0]] = error.message;
-          return acc;
-        }, {});
+        const newErrors = err.errors.reduce(
+          (acc: { [key: string]: string }, error) => {
+            acc[error.path[0]] = error.message;
+            return acc;
+          },
+          {}
+        );
         setErrors(newErrors);
       }
     }
@@ -140,80 +114,23 @@ export const ListingForm = () => {
                 </label>
               ))}
             </div>
-            <button
-              type="button"
-              className={styles.button}
-              onClick={nextStep}
-              disabled={!formData.type}
-            >
+            <button type="button" className={styles.button} onClick={nextStep}>
               Следующий шаг
             </button>
           </div>
         )}
 
-        {step === 1 && formData.type && (
-          <div className={styles.fields}>
-            <ul className={styles.inputs}>
-              {commonFields.map((field) => (
-                <div key={field.name} className={styles.field}>
-                  <label className={styles.label}>
-                    {field.label}:
-                    <input
-                      className={styles.input}
-                      type={field.type}
-                      name={field.name}
-                      value={
-                        formData[field.name as keyof ListingFormData] === 0 ||
-                        formData[field.name as keyof ListingFormData] === -1
-                          ? ""
-                          : formData[field.name as keyof ListingFormData] || ""
-                      }
-                      onChange={handleInputChange}
-                    />
-                  </label>
-                  {errors[field.name] && (
-                    <span className={styles.error}>{errors[field.name]}</span>
-                  )}
-                </div>
-              ))}
-
-              {typeFields[formData.type]?.map((field) => (
-                <div key={field.name} className={styles.field}>
-                  <label className={styles.label}>
-                    {field.label}:
-                    <input
-                      className={styles.input}
-                      type={field.type}
-                      name={field.name}
-                      value={
-                        formData[field.name as keyof ListingFormData] === 0 ||
-                        formData[field.name as keyof ListingFormData] === -1
-                          ? ""
-                          : formData[field.name as keyof ListingFormData] || ""
-                      }
-                      onChange={handleInputChange}
-                    />
-                  </label>
-                  {errors[field.name] && (
-                    <span className={styles.error}>{errors[field.name]}</span>
-                  )}
-                </div>
-              ))}
-            </ul>
-
-            <div className={styles.buttonGroup}>
-              <button
-                className={styles.button}
-                type="button"
-                onClick={prevStep}
-              >
-                Предыдущий шаг
-              </button>
-              <button onClick={handleSubmit} className={styles.button}>
-                Отправить
-              </button>
-            </div>
-          </div>
+        {step === 1 && (
+          <ListForm
+            type={formData.type || ""}
+            isEdit={false}
+            formData={formData as Omit<Item, "id">}
+            onChange={handleChange}
+            handleSave={handleSubmit}
+            errors={errors}
+            nextStep={nextStep}
+            prevStep={prevStep}
+          />
         )}
       </div>
     </>

@@ -1,21 +1,33 @@
 import React from "react";
+import { Item } from "../../types/listings";
+
 import styles from "./EditModal.module.scss";
+import { ListForm } from "../ListForm/ListForm";
 
-import { commonFields, typeFields } from "../../constants/form";
+interface EditModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  formData: Omit<Item, "id"> | null;
+  setFormData: React.Dispatch<React.SetStateAction<Omit<Item, "id"> | null>>;
+  handleSave: () => void;
+  errors: { [key: string]: string };
+}
 
-export const EditModal = ({
+export const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
   title,
   formData,
   setFormData,
-  onSave,
+  handleSave,
   errors,
 }) => {
   if (!isOpen || !formData) return null;
 
-  const handleChange = (key, value) => {
-    const isNumericField = [
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const numberFields = [
       "area",
       "rooms",
       "price",
@@ -23,17 +35,19 @@ export const EditModal = ({
       "mileage",
       "experience",
       "cost",
-    ].includes(key);
+    ];
 
-    const parsedValue = isNumericField
-      ? value === ""
-        ? -1
+    const newValue = numberFields.includes(name)
+      ? value.trim() === ""
+        ? value
+        : isNaN(Number(value))
+        ? value
         : Number(value)
       : value;
 
     setFormData((prevData) => ({
-      ...prevData,
-      [key]: parsedValue,
+      ...prevData!,
+      [name]: newValue,
     }));
   };
 
@@ -44,52 +58,15 @@ export const EditModal = ({
           &times;
         </button>
         <h2>{title}</h2>
-        <div>
-          {commonFields.map((field) => (
-            <div key={field.name} className={styles.formField}>
-              <label>{field.label}:</label>
-              <input
-                type={field.type}
-                value={
-                  formData[field.name] === 0 || formData[field.name] === -1
-                    ? ""
-                    : formData[field.name] || ""
-                }
-                onChange={(e) => handleChange(field.name, e.target.value)}
-              />
-              {errors[field.name] && (
-                <span className={styles.error}>{errors[field.name]}</span>
-              )}
-            </div>
-          ))}
-
-          {formData.type &&
-            typeFields[formData.type]?.map((field) => (
-              <div key={field.name} className={styles.formField}>
-                <label>{field.label}:</label>
-                <input
-                  type={field.type}
-                  value={
-                    formData[field.name] === 0 || formData[field.name] === -1
-                      ? ""
-                      : formData[field.name] || ""
-                  }
-                  onChange={(e) => handleChange(field.name, e.target.value)}
-                />
-                {errors[field.name] && (
-                  <span className={styles.error}>{errors[field.name]}</span>
-                )}
-              </div>
-            ))}
-        </div>
-        <div className={styles.buttonContainer}>
-          <button type="button" className={styles.button} onClick={onClose}>
-            Отмена
-          </button>
-          <button type="button" className={styles.button} onClick={onSave}>
-            Сохранить
-          </button>
-        </div>
+        <ListForm
+          type={formData.type}
+          isEdit={true}
+          handleSave={handleSave}
+          formData={formData}
+          onChange={handleChange}
+          onClose={onClose}
+          errors={errors}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Item } from "../../types/listings";
+import { typeFields } from "../../constants/form";
+
 import styles from "./Listing.module.scss";
 
 interface ListingProps {
@@ -20,11 +21,7 @@ export const Listing = ({ item }: ListingProps) => {
   return (
     <div className={styles.listing} onClick={handleClick}>
       <div className={styles.imageContainer}>
-        <img
-          src={item.imageUrl || defaultImageUrl}
-          alt={item.name}
-          className={styles.image}
-        />
+        <img src={defaultImageUrl} alt={item.name} className={styles.image} />
       </div>
       <div className={styles.content}>
         <h3>{item.name}</h3>
@@ -35,28 +32,13 @@ export const Listing = ({ item }: ListingProps) => {
         <p>
           <b>Тип:</b> {item.type}
         </p>
-        {item.type === "Недвижимость" && (
-          <div className={styles.details}>
-            <span>Площадь: {item.area} м²</span>
-            <span>Комнаты: {item.rooms}</span>
-            <span>Цена: {item.price} руб.</span>
-          </div>
-        )}
-        {item.type === "Авто" && (
-          <div className={styles.details}>
-            <span>Марка: {item.brand}</span>
-            <span>Модель: {item.model}</span>
-            <span>Год: {item.year}</span>
-            <span>Пробег: {item.mileage} км</span>
-          </div>
-        )}
-        {item.type === "Услуги" && (
-          <div className={styles.details}>
-            <span>Тип услуги: {item.serviceType}</span>
-            <span>Опыт: {item.experience} лет</span>
-            <span>Стоимость: {item.cost} руб.</span>
-          </div>
-        )}
+        <div className={styles.details}>
+          {typeFields[item.type]?.map((field) => (
+            <span key={field.name}>
+              {field.label}: {item[field.name as keyof Item]}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );

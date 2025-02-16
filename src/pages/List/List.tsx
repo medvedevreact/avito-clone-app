@@ -1,9 +1,9 @@
-import React from "react";
-import { Listings } from "../../components/Listings/Listings";
-import styles from "./List.module.scss";
 import { FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { Listings } from "../../components/Listings/Listings";
 import { Container } from "../../components/Container/Container";
+
+import styles from "./List.module.scss";
 
 export const List = () => {
   const navigate = useNavigate();
@@ -16,7 +16,6 @@ export const List = () => {
           Разместить объявление
         </button>
       </div>
-
       <Listings />
     </Container>
   );

@@ -84,52 +84,6 @@
   transform: translate(-50%, -50%);
 }
 
-.fields {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-.inputs {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  flex-grow: 1;
-}
-
-.field {
-  text-align: left;
-}
-
-.input:focus {
-  border-color: #007bff;
-  outline: none;
-}
-
-.label {
-  display: block;
-  font-size: 16px;
-  color: #666;
-}
-
-.input {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.buttonGroup {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 25px;
-}
-
 .button {
   padding: 10px 20px;
   font-size: 16px;
@@ -143,9 +97,4 @@
 
 .button:hover {
   background-color: #0056b3;
-}
-.error {
-  color: red;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
 }

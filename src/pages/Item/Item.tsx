@@ -1,56 +1,28 @@
-import React, { useEffect, useState } from "react";
-
-import styles from "./Item.module.scss";
-import { EditModal } from "../../components/modals/EditModal";
+import { useEffect, useState } from "react";
+import { z } from "zod";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { EditModal } from "../../components/modals/EditModal";
 import { listingSchema } from "../../components/ListingForm/ListingFormShema";
 import { trimObjectValues } from "../../lib/utils";
-import { z } from "zod";
 import { Container } from "../../components/Container/Container";
-
-const defaultFormState = {
-  Недвижимость: {
-    type: "Недвижимость",
-    name: "",
-    description: "",
-    location: "",
-    propertyType: "",
-    area: 0,
-    rooms: 0,
-    price: 0,
-  },
-  Авто: {
-    type: "Авто",
-    name: "",
-    description: "",
-    location: "",
-    brand: "",
-    model: "",
-    year: 0,
-    mileage: -1,
-  },
-  Услуги: {
-    type: "Услуги",
-    name: "",
-    description: "",
-    location: "",
-    serviceType: "",
-    experience: -1,
-    cost: 0,
-  },
-};
+import { Item as ItemType } from "../../types/listings";
+import { updateItem } from "../../store/itemsSlice";
+import { useAppDispatch } from "../../store";
+import { emptyItemState, typeFields } from "../../constants/form";
+import styles from "./Item.module.scss";
 
 export const Item = () => {
   const { id } = useParams();
-  const [item, setItem] = useState(null);
+
+  const [item, setItem] = useState<ItemType | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState(null);
+  const [formData, setFormData] = useState<Omit<ItemType, "id"> | null>(null);
   const [errors, setErrors] = useState({});
 
-  console.log(formData);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const fetchItem = async () => {
@@ -68,7 +40,7 @@ export const Item = () => {
 
   const openModal = () => {
     if (item) {
-      setFormData({ ...defaultFormState[item.type], ...item });
+      setFormData({ ...emptyItemState[item.type], ...item });
       setIsModalOpen(true);
     }
   };
@@ -83,24 +55,45 @@ export const Item = () => {
       const trimmedFormData = trimObjectValues(formData);
       const validatedForm = listingSchema.parse(trimmedFormData);
 
-      await axios.put(`http://localhost:3000/items/${id}`, validatedForm);
-      setItem(validatedForm);
+      const updatedItem = await dispatch(
+        updateItem({ id: Number(id), updatedItem: validatedForm })
+      ).unwrap();
+
+      setItem(updatedItem);
       closeModal();
       setErrors({});
     } catch (err) {
       if (err instanceof z.ZodError) {
-        const newErrors = err.errors.reduce((acc, error) => {
-          acc[error.path[0]] = error.message;
-          return acc;
-        }, {});
+        const newErrors = err.errors.reduce(
+          (acc: { [key: string]: string }, error) => {
+            acc[error.path[0]] = error.message;
+            return acc;
+          },
+          {}
+        );
         setErrors(newErrors);
       }
     }
   };
 
-  if (loading) return <div>Загрузка...</div>;
-  if (error) return <div>{error}</div>;
-  if (!item) return <div>Объявление не найдено.</div>;
+  if (loading)
+    return (
+      <Container>
+        <div className={styles.item}>Загрузка...</div>
+      </Container>
+    );
+  if (error)
+    return (
+      <Container>
+        <div className={styles.item}>{error}</div>
+      </Container>
+    );
+  if (!item)
+    return (
+      <Container>
+        <div className={styles.item}>Объявление не найдено.</div>
+      </Container>
+    );
 
   return (
     <Container>
@@ -108,7 +101,6 @@ export const Item = () => {
         <div className={styles.imageContainer}>
           <img
             src={
-              item.imageUrl ||
               "https://avatars.mds.yandex.net/get-mpic/6780724/img_id5398870021742881284.jpeg/orig"
             }
             alt={item.name}
@@ -124,28 +116,13 @@ export const Item = () => {
           <p>
             <b>Тип:</b> {item.type}
           </p>
-          {item.type === "Недвижимость" && (
-            <div className={styles.details}>
-              <span>Площадь: {item.area} м²</span>
-              <span>Комнаты: {item.rooms}</span>
-              <span>Цена: {item.price} руб.</span>
-            </div>
-          )}
-          {item.type === "Авто" && (
-            <div className={styles.details}>
-              <span>Марка: {item.brand}</span>
-              <span>Модель: {item.model}</span>
-              <span>Год: {item.year}</span>
-              <span>Пробег: {item.mileage} км</span>
-            </div>
-          )}
-          {item.type === "Услуги" && (
-            <div className={styles.details}>
-              <span>Тип услуги: {item.serviceType}</span>
-              <span>Опыт: {item.experience} лет</span>
-              <span>Стоимость: {item.cost} руб.</span>
-            </div>
-          )}
+          <div className={styles.details}>
+            {typeFields[item.type]?.map((field) => (
+              <span key={field.name}>
+                {field.label}: {item[field.name as keyof ItemType]}
+              </span>
+            ))}
+          </div>
           <button className={styles.editButton} onClick={openModal}>
             Редактировать
           </button>
@@ -157,7 +134,7 @@ export const Item = () => {
         title="Редактировать объявление"
         formData={formData}
         setFormData={setFormData}
-        onSave={handleSave}
+        handleSave={handleSave}
         errors={errors}
       />
     </Container>
