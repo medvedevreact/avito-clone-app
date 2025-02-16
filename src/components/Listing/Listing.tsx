@@ -19,7 +19,7 @@ export const Listing = ({ item }: ListingProps) => {
   };
 
   return (
-    <div className={styles.listing} onClick={handleClick}>
+    <div className={styles.listing}>
       <div className={styles.imageContainer}>
         <img src={defaultImageUrl} alt={item.name} className={styles.image} />
       </div>
@@ -39,6 +39,9 @@ export const Listing = ({ item }: ListingProps) => {
             </span>
           ))}
         </div>
+        <button onClick={handleClick} className={styles.openButton}>
+          Открыть
+        </button>
       </div>
     </div>
   );
